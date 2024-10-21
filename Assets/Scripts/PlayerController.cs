@@ -20,5 +20,19 @@ public class Player : MonoBehaviour
         vertical = Input.GetAxisRaw("Vertical");
 
         rd.velocity = new Vector2(horizontal * speed, vertical * speed);
+
+        if(horizontal > 0){
+            GetComponent<Animator>().Play("right");
+
+        }else if(horizontal < 0){
+            GetComponent<Animator>().Play("left");
+            
+        }else if(vertical > 0){
+            GetComponent<Animator>().Play("Up");
+            
+        }else if(vertical < 0){
+            GetComponent<Animator>().Play("Down");
+            
+        }
     }
 }
