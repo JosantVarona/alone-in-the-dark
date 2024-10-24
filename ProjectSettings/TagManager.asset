@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -50,9 +51,9 @@ TagManager:
   - name: Player
     uniqueID: 1413689043
     locked: 0
-  - name: fusion
-    uniqueID: 4266597571
-    locked: 0
   - name: Obstacles
     uniqueID: 3823191691
+    locked: 0
+  - name: shoot
+    uniqueID: 4267745505
     locked: 0
