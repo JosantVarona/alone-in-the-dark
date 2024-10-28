@@ -28,6 +28,7 @@ public class Enemy : MonoBehaviour
         {
             MoveTowardsTarget();
         }
+        
     }
 
    void MoveTowardsTarget()
