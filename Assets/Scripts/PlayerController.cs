@@ -8,10 +8,14 @@ public class Player : MonoBehaviour
     private float horizontal;
     private float vertical;
     private float speed = 4.0f;
-    public int Live = 5;               // Vidas del jugador
-    public TMP_Text live;               // Texto de UI para mostrar vidas
-    private bool isImmune = false;      // Estado de inmunidad temporal
-    public float immuneTime = 2.0f;     // Tiempo de inmunidad en segundos
+    public int Live = 5;                  
+    public TMP_Text live;                 // Texto de UI para mostrar vidas
+    private bool isImmune = false;        // Estado de inmunidad temporal
+    public float immuneTime = 2.0f;       // Tiempo de inmunidad en segundos
+    private Coroutine immunityCoroutine;  // Referencia para detener la corrutina de inmunidad
+    private float lastDamageTime = -10f;  // Marca el último tiempo en que se recibió daño
+    private Color originalColor;          // Almacena el color original del jugador
+    private SpriteRenderer spriteRenderer; // Referencia al componente SpriteRenderer
 
     Rigidbody2D rd;
 
@@ -20,6 +24,10 @@ public class Player : MonoBehaviour
         live.text = "Vidas: " + Live;   // Mostrar la cantidad inicial de vidas
         rd = GetComponent<Rigidbody2D>();
         rd.gravityScale = 0;
+
+        // Obtén el SpriteRenderer y almacena el color original
+        spriteRenderer = GetComponent<SpriteRenderer>();
+        originalColor = spriteRenderer.color;
     }
 
     void Update()
@@ -51,10 +59,11 @@ public class Player : MonoBehaviour
     // Método para detección de colisión
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Enemy") && !isImmune)  // Verifica si colisiona con "Enemy" y no está inmune
+        if (collision.gameObject.CompareTag("Enemy") && !isImmune)
         {
-            TakeDamage(1);       // Llamamos a TakeDamage con la cantidad de vida a restar
+            TakeDamage(1);      
         }
+        
     }
 
     // Método para reducir vida e iniciar inmunidad
@@ -66,19 +75,32 @@ public class Player : MonoBehaviour
         if (Live <= 0)
         {
             Debug.Log("Jugador ha muerto");
-            // Aquí podrías añadir lógica de Game Over
+            GetComponent<Animator>().Play("Deat");  // Ejecuta la animación "Deat"
+            // Aquí podrías añadir lógica de Game Over, como desactivar el control del jugador
+            // por ejemplo: this.enabled = false;
         }
         else
         {
-            StartCoroutine(ActivateImmunity());  // Inicia la inmunidad temporal
+            // Actualiza el tiempo del último daño recibido
+            lastDamageTime = Time.time;
+
+            // Si hay una inmunidad en curso, detenemos la corrutina actual antes de iniciar una nueva
+            if (immunityCoroutine != null)
+            {
+                StopCoroutine(immunityCoroutine);
+            }
+            immunityCoroutine = StartCoroutine(ActivateImmunity());  // Inicia la inmunidad temporal
         }
     }
 
     // Corrutina para activar inmunidad por un tiempo
     private IEnumerator ActivateImmunity()
     {
-        isImmune = true;                 // Activa inmunidad
+        isImmune = true;                        // Activa inmunidad
+        spriteRenderer.color = Color.red;       // Cambia el color a rojo para indicar daño
         yield return new WaitForSeconds(immuneTime);  // Espera el tiempo de inmunidad
-        isImmune = false;                // Desactiva inmunidad
+        spriteRenderer.color = originalColor;   // Restaura el color original
+        isImmune = false;                       // Desactiva inmunidad
+        immunityCoroutine = null;               // Limpia la referencia de la corrutina
     }
 }
