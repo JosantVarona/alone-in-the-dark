@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -8,20 +7,34 @@ public class Player : MonoBehaviour
     private float horizontal;
     private float vertical;
     private float speed = 4.0f;
-    public int Live = 5;                  
-    public TMP_Text live;                 // Texto de UI para mostrar vidas
-    private bool isImmune = false;        // Estado de inmunidad temporal
-    public float immuneTime = 2.0f;       // Tiempo de inmunidad en segundos
-    private Coroutine immunityCoroutine;  // Referencia para detener la corrutina de inmunidad
-    private float lastDamageTime = -10f;  // Marca el último tiempo en que se recibió daño
-    private Color originalColor;          // Almacena el color original del jugador
+    public int Live;                     // Vidas del jugador, asignadas desde InstancePlayer
+    public TMP_Text live;                // Texto de UI para mostrar vidas
+    private bool isImmune = false;       // Estado de inmunidad temporal
+    public float immuneTime = 2.0f;      // Tiempo de inmunidad en segundos
+    private Coroutine immunityCoroutine; // Referencia para detener la corrutina de inmunidad
+    private float lastDamageTime = -10f; // Marca el último tiempo en que se recibió daño
+    private Color originalColor;         // Almacena el color original del jugador
     private SpriteRenderer spriteRenderer; // Referencia al componente SpriteRenderer
 
-    Rigidbody2D rd;
+    private Rigidbody2D rd;
+
+    private void Awake()
+    {
+        // Evita duplicar el objeto Player
+        if (FindObjectsOfType<Player>().Length > 1)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            DontDestroyOnLoad(gameObject); // Persiste entre escenas
+        }
+    }
 
     void Start()
     {
-        live.text = "Vidas: " + Live;   // Mostrar la cantidad inicial de vidas
+        // Carga la vida inicial del jugador desde InstancePlayer
+        live.text = "Vidas: " + Live;    // Mostrar la cantidad inicial de vidas
         rd = GetComponent<Rigidbody2D>();
         rd.gravityScale = 0;
 
@@ -61,9 +74,8 @@ public class Player : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy") && !isImmune)
         {
-            TakeDamage(1);      
+            TakeDamage(1);
         }
-        
     }
 
     // Método para reducir vida e iniciar inmunidad
@@ -77,7 +89,7 @@ public class Player : MonoBehaviour
             Debug.Log("Jugador ha muerto");
             GetComponent<Animator>().Play("Deat");  // Ejecuta la animación "Deat"
             // Aquí podrías añadir lógica de Game Over, como desactivar el control del jugador
-            // por ejemplo: this.enabled = false;
+            this.enabled = false;
         }
         else
         {
