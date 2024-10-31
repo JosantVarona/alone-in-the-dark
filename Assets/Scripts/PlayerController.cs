@@ -76,13 +76,15 @@ public class Player : MonoBehaviour
         {
             TakeDamage(1);
         }
+    
+        
     }
 
     // Método para reducir vida e iniciar inmunidad
     private void TakeDamage(int damage)
     {
         Live -= damage;                    // Reduce vida
-        live.text = "Vidas: " + Live;      // Actualiza el texto de la vida
+        live.text = "Vidas: " + Live;   // Actualiza el texto de la vida
 
         if (Live <= 0)
         {
@@ -114,5 +116,11 @@ public class Player : MonoBehaviour
         spriteRenderer.color = originalColor;   // Restaura el color original
         isImmune = false;                       // Desactiva inmunidad
         immunityCoroutine = null;               // Limpia la referencia de la corrutina
+    }
+     public void AddLife(int amount)
+    {
+        Live += amount;                    // Añade vida
+        live.text = "Vidas: " + Live;       // Actualiza el texto de vida
+        Debug.Log("Vida añadida. Total de vidas: " + Live);
     }
 }

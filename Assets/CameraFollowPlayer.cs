@@ -21,7 +21,7 @@ public class CameraFollowPlayer : MonoBehaviour
         
         if (player != null)
         {
-            Debug.Log("hola");
+            //Debug.Log("hola");
             // Asigna el transform del jugador al campo Follow de la cámara
             virtualCamera.Follow = player.transform;
         }
@@ -31,6 +31,7 @@ public class CameraFollowPlayer : MonoBehaviour
         }
     }
 
+    /*Esto da fallo
     void OnEnable()
     {
         // Suscribirse al evento de escena cargada para reasignar el objetivo
@@ -47,5 +48,5 @@ public class CameraFollowPlayer : MonoBehaviour
     {
         // Llama de nuevo a AssignPlayerAsTarget al cargar una nueva escena
         AssignPlayerAsTarget();
-    }
+    }*/
 }
