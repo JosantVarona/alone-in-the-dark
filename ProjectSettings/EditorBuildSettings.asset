@@ -6,6 +6,21 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Menu-Principal.unity
+    guid: 37c525b140d15a64ca44792dfcb92de8
+  - enabled: 1
+    path: Assets/Scenes/Tutorial.unity
+    guid: 13ae493fe725d0b4b9b995ed16951740
+  - enabled: 1
     path: Assets/Scenes/MapaPrincipal.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/Mazmorra.unity
+    guid: aadefe9ae9ef3bd4cb4793f25d4b2c7e
+  - enabled: 1
+    path: Assets/Scenes/Game-Over.unity
+    guid: 6fe1400e208505c44b082f3011e16e8a
+  - enabled: 1
+    path: Assets/Scenes/Game-Win.unity
+    guid: 0b2b76ad8ded0be4d819a14c74c6b48b
   m_configObjects: {}

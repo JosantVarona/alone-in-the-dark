@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Enemy
   - Wall
+  - SpawnPoint
+  - Fruta
   layers:
   - Default
   - TransparentFX
@@ -54,6 +56,9 @@ TagManager:
     locked: 0
   - name: Obstacles
     uniqueID: 3823191691
+    locked: 0
+  - name: Fruta
+    uniqueID: 3929685251
     locked: 0
   - name: shoot
     uniqueID: 4267745505

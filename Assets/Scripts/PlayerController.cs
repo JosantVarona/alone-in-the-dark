@@ -1,27 +1,42 @@
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class Player : MonoBehaviour
 {
     private float horizontal;
     private float vertical;
     private float speed = 4.0f;
-    public int Live = 5;                  
-    public TMP_Text live;                 // Texto de UI para mostrar vidas
-    private bool isImmune = false;        // Estado de inmunidad temporal
-    public float immuneTime = 2.0f;       // Tiempo de inmunidad en segundos
-    private Coroutine immunityCoroutine;  // Referencia para detener la corrutina de inmunidad
-    private float lastDamageTime = -10f;  // Marca el último tiempo en que se recibió daño
-    private Color originalColor;          // Almacena el color original del jugador
+    public int Live;                     // Vidas del jugador, asignadas desde InstancePlayer
+    public TMP_Text live;                // Texto de UI para mostrar vidas
+    private bool isImmune = false;       // Estado de inmunidad temporal
+    public float immuneTime = 2.0f;      // Tiempo de inmunidad en segundos
+    private Coroutine immunityCoroutine; // Referencia para detener la corrutina de inmunidad
+    private float lastDamageTime = -10f; // Marca el último tiempo en que se recibió daño
+    private Color originalColor;         // Almacena el color original del jugador
     private SpriteRenderer spriteRenderer; // Referencia al componente SpriteRenderer
 
-    Rigidbody2D rd;
+    private Rigidbody2D rd;
+
+    private void Awake()
+    {
+        // Evita duplicar el objeto Player
+        if (FindObjectsOfType<Player>().Length > 1)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            DontDestroyOnLoad(gameObject); // Persiste entre escenas
+        }
+    }
 
     void Start()
     {
-        live.text = "Vidas: " + Live;   // Mostrar la cantidad inicial de vidas
+        // Carga la vida inicial del jugador desde InstancePlayer
+        live.text = "Vidas: " + Live;    // Mostrar la cantidad inicial de vidas
         rd = GetComponent<Rigidbody2D>();
         rd.gravityScale = 0;
 
@@ -56,13 +71,23 @@ public class Player : MonoBehaviour
         }
     }
 
+    // Método que al morir vuelva a tener 5 vidas
+    public void ResetPlayer()
+    {
+        Live = 5; // Restablecer vidas
+        live.text = "Vidas: " + Live; // Actualizar el texto de UI
+        // Otras configuraciones para restablecer el jugador, si es necesario
+    }
+
+
     // Método para detección de colisión
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Enemy") && !isImmune)
         {
-            TakeDamage(1);      
+            TakeDamage(1);
         }
+    
         
     }
 
@@ -70,15 +95,15 @@ public class Player : MonoBehaviour
     private void TakeDamage(int damage)
     {
         Live -= damage;                    // Reduce vida
-        live.text = "Vidas: " + Live;      // Actualiza el texto de la vida
+        live.text = "Vidas: " + Live;   // Actualiza el texto de la vida
 
-        if (Live <= 0)
-        {
+        if (Live <= 0){
             Debug.Log("Jugador ha muerto");
             GetComponent<Animator>().Play("Deat");  // Ejecuta la animación "Deat"
-            // Aquí podrías añadir lógica de Game Over, como desactivar el control del jugador
-            // por ejemplo: this.enabled = false;
+            // Cargar la escena de Game Over
+            SceneManager.LoadScene("Game-Over"); // Asegúrate de que el nombre coincida con tu escena de Game Over
         }
+
         else
         {
             // Actualiza el tiempo del último daño recibido
@@ -102,5 +127,11 @@ public class Player : MonoBehaviour
         spriteRenderer.color = originalColor;   // Restaura el color original
         isImmune = false;                       // Desactiva inmunidad
         immunityCoroutine = null;               // Limpia la referencia de la corrutina
+    }
+     public void AddLife(int amount)
+    {
+        Live += amount;                    // Añade vida
+        live.text = "Vidas: " + Live;       // Actualiza el texto de vida
+        Debug.Log("Vida añadida. Total de vidas: " + Live);
     }
 }
