@@ -1,6 +1,8 @@
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 
 public class Player : MonoBehaviour
 {
@@ -69,6 +71,15 @@ public class Player : MonoBehaviour
         }
     }
 
+    // Método que al morir vuelva a tener 5 vidas
+    public void ResetPlayer()
+    {
+        Live = 5; // Restablecer vidas
+        live.text = "Vidas: " + Live; // Actualizar el texto de UI
+        // Otras configuraciones para restablecer el jugador, si es necesario
+    }
+
+
     // Método para detección de colisión
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -86,13 +97,13 @@ public class Player : MonoBehaviour
         Live -= damage;                    // Reduce vida
         live.text = "Vidas: " + Live;   // Actualiza el texto de la vida
 
-        if (Live <= 0)
-        {
+        if (Live <= 0){
             Debug.Log("Jugador ha muerto");
             GetComponent<Animator>().Play("Deat");  // Ejecuta la animación "Deat"
-            // Aquí podrías añadir lógica de Game Over, como desactivar el control del jugador
-            this.enabled = false;
+            // Cargar la escena de Game Over
+            SceneManager.LoadScene("Game-Over"); // Asegúrate de que el nombre coincida con tu escena de Game Over
         }
+
         else
         {
             // Actualiza el tiempo del último daño recibido
