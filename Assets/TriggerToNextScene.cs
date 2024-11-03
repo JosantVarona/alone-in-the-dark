@@ -7,9 +7,13 @@ public class TriggerToNextScene : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
+            // Cierra la instancia de IntancePlayer y destruye al jugador antes de cargar la nueva escena
+            IntancePlayer.CloseInstance();  // Cierra el singleton
+            Destroy(other.gameObject);      // Destruye el objeto jugador
+
             // Cargar la escena de Game-Win
             SceneManager.LoadScene("Game-Win");
-            SceneManager.sceneLoaded += OnSceneLoaded; // Agrega el evento para reposicionar al jugador
+            SceneManager.sceneLoaded += OnSceneLoaded; // Agrega el evento para reposicionar al jugador si se vuelve a crear
         }
     }
 

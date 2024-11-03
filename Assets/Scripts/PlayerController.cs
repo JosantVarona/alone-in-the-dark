@@ -3,7 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 public class Player : MonoBehaviour
 {
     private float horizontal;
@@ -17,99 +16,85 @@ public class Player : MonoBehaviour
     private float lastDamageTime = -10f; // Marca el último tiempo en que se recibió daño
     private Color originalColor;         // Almacena el color original del jugador
     private SpriteRenderer spriteRenderer; // Referencia al componente SpriteRenderer
-
     private Rigidbody2D rd;
+    private Animator animator;
 
     private void Awake()
     {
-        // Evita duplicar el objeto Player
         if (FindObjectsOfType<Player>().Length > 1)
         {
             Destroy(gameObject);
         }
         else
         {
-            DontDestroyOnLoad(gameObject); // Persiste entre escenas
+            DontDestroyOnLoad(gameObject);
         }
     }
 
     void Start()
     {
-        // Carga la vida inicial del jugador desde InstancePlayer
-        live.text = "Vidas: " + Live;    // Mostrar la cantidad inicial de vidas
+        // Obtiene la vida inicial del jugador desde IntancePlayer
+        Live = IntancePlayer.instance != null ? IntancePlayer.instance.initialLives : 5;
+        live.text = "Vidas: " + Live; // Mostrar la cantidad inicial de vidas
         rd = GetComponent<Rigidbody2D>();
         rd.gravityScale = 0;
-
-        // Obtén el SpriteRenderer y almacena el color original
         spriteRenderer = GetComponent<SpriteRenderer>();
         originalColor = spriteRenderer.color;
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
-        // Movimiento del jugador
         horizontal = Input.GetAxisRaw("Horizontal");
         vertical = Input.GetAxisRaw("Vertical");
         rd.velocity = new Vector2(horizontal * speed, vertical * speed);
 
-        // Control de animaciones basadas en el movimiento
         if (horizontal > 0)
         {
-            GetComponent<Animator>().Play("right");
+            animator.Play("right");
         }
         else if (horizontal < 0)
         {
-            GetComponent<Animator>().Play("left");
+            animator.Play("left");
         }
         else if (vertical > 0)
         {
-            GetComponent<Animator>().Play("Up");
+            animator.Play("Up");
         }
         else if (vertical < 0)
         {
-            GetComponent<Animator>().Play("Down");
+            animator.Play("Down");
         }
     }
 
-    // Método que al morir vuelva a tener 5 vidas
     public void ResetPlayer()
     {
         Live = 5; // Restablecer vidas
-        live.text = "Vidas: " + Live; // Actualizar el texto de UI
-        // Otras configuraciones para restablecer el jugador, si es necesario
+        live.text = "Vidas: " + Live;
     }
 
-
-    // Método para detección de colisión
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.CompareTag("Enemy") && !isImmune)
         {
             TakeDamage(1);
         }
-    
-        
     }
-
-    // Método para reducir vida e iniciar inmunidad
+    //El quiteas la vida
     private void TakeDamage(int damage)
     {
         Live -= damage;                    // Reduce vida
-        live.text = "Vidas: " + Live;   // Actualiza el texto de la vida
+        live.text = "Vidas: " + Live;
 
-        if (Live <= 0){
+        if (Live <= 0)
+        {
             Debug.Log("Jugador ha muerto");
-            GetComponent<Animator>().Play("Deat");  // Ejecuta la animación "Deat"
-            // Cargar la escena de Game Over
-            SceneManager.LoadScene("Game-Over"); // Asegúrate de que el nombre coincida con tu escena de Game Over
+            StartCoroutine(HandleDeath());  // Ejecuta la rutina para manejar la muerte
         }
-
         else
         {
-            // Actualiza el tiempo del último daño recibido
             lastDamageTime = Time.time;
 
-            // Si hay una inmunidad en curso, detenemos la corrutina actual antes de iniciar una nueva
             if (immunityCoroutine != null)
             {
                 StopCoroutine(immunityCoroutine);
@@ -117,21 +102,30 @@ public class Player : MonoBehaviour
             immunityCoroutine = StartCoroutine(ActivateImmunity());  // Inicia la inmunidad temporal
         }
     }
-
-    // Corrutina para activar inmunidad por un tiempo
+    //Este metodo es para hacer la animacon de recibir daño
     private IEnumerator ActivateImmunity()
     {
-        isImmune = true;                        // Activa inmunidad
-        spriteRenderer.color = Color.red;       // Cambia el color a rojo para indicar daño
-        yield return new WaitForSeconds(immuneTime);  // Espera el tiempo de inmunidad
-        spriteRenderer.color = originalColor;   // Restaura el color original
-        isImmune = false;                       // Desactiva inmunidad
-        immunityCoroutine = null;               // Limpia la referencia de la corrutina
+        isImmune = true;                        
+        spriteRenderer.color = Color.red;       
+        yield return new WaitForSeconds(immuneTime);  
+        spriteRenderer.color = originalColor;   
+        isImmune = false;                       
+        immunityCoroutine = null;               
     }
-     public void AddLife(int amount)
+    //Este metodo es para el volver a intentar
+    private IEnumerator HandleDeath()
     {
-        Live += amount;                    // Añade vida
-        live.text = "Vidas: " + Live;       // Actualiza el texto de vida
+        animator.Play("Deat"); 
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).length); 
+        SceneManager.LoadScene("Game-Over"); 
+        IntancePlayer.CloseInstance(); 
+        Destroy(gameObject); 
+    }
+
+    public void AddLife(int amount)
+    {
+        Live += amount;                    
+        live.text = "Vidas: " + Live;      
         Debug.Log("Vida añadida. Total de vidas: " + Live);
     }
 }
